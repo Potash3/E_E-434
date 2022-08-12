@@ -1,0 +1,168 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[top=0.5in,bottom=0.5in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathptmx}
+\usepackage{color}
+\definecolor{blue}{RGB}{0,112,192}
+\usepackage{graphicx}
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+
+
+\begin{document}
+\title{\Large{\textbf{Lab 3\ -\ Buffer Insertion}}}
+\author{Name: Yi Yao\\ID: 011743488}
+\date{}
+\maketitle
+
+\begin{flushleft}
+\section*{Problem}
+$\bullet$\quad Satisfy the given timing constraint.\\
+\hspace*{\fill} \\
+$\bullet$\quad Minimize the total buffer size (the sum of BUF$\_$X$\#$).\\
+\hspace*{\fill} \\
+$\bullet$\quad Submit\\
+\hspace*{0.7cm}$-$\ Final DEF file (see the next slide)\\
+\hspace*{0.7cm}$-$\ Final timing report (a screenshot or copy $\&$ paste)\\
+\hspace*{0.7cm}$-$\ Total buffer size\\
+\hspace*{0.7cm}$-$\ A brief description of the optimization methodology you used.\\
+\hspace*{\fill} \\
+
+\section*{Background}
+$\bullet$\quad The design has a two-input NAND gate.\\
+\hspace*{\fill} \\
+$\bullet$\quad g$\_$out= ~(g$\_$in[0] AND g$\_$in[1])\\
+\hspace*{\fill} \\
+$\bullet$\quad Timing constraint: 500ps\\
+\hspace*{\fill} \\
+$\bullet$\quad Layout width: 5,000um\\
+\hspace*{0.7cm}$-$\ The two input pins are on the left side of the layout.\\
+\hspace*{0.7cm}$-$\ The output pin is on the right side.\\
+\hspace*{0.7cm}$-$\ The NAND gate is on the left side.\\
+\hspace*{0.7cm}$-$\ Thus, the distance between the output of the NAND gate and the output pin g$\_$outis \hspace*{1.1cm}almost 5,000um.\\
+\hspace*{0.7cm}$-$\ You are supposed to minimize the delay.\\
+\hspace*{\fill} \\
+$\bullet$\quad Buffer Types: BUF$\_$X1, BUF$\_$X2, BUF$\_$X4, BUF$\_$X8, BUF$\_$X16, BUF$\_$X32\\
+\hspace*{\fill} \\
+$\bullet$\quad Raw data: Arrival Time = 2.323, Slack Time = 1.823\\
+
+\begin{figure}[ht]
+\includegraphics[scale=0.8]{figure1.png}
+\end{figure}
+
+\newpage
+\section*{The Optimization Methodology}
+From the Background, we should take into account three factors to optimize the circuit delay. They are Buffer number = N, Location = L, and Burffer types = BUF$\_$X$\#$.\\
+\subsection*{1. Delay minimization of a long wire}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.5]{figure2.png}
+\end{figure}
+$\tau$ = $R_{input}$$\cdot$($C_{wire}$ + $C_L$) + $R_{wire}$$\cdot$$C_L$ + $\tau_1$ + $\frac{R_{wire}\cdot C_{wire}}{2}$\\
+\hspace*{\fill} \\
+
+\subsection*{2. Insert buffers}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.5]{figure3.png}
+\end{figure}
+$\tau$ = $R_{input}$$\cdot$($\frac{C_{wire}}{\frac{L}{S_k}}$ + $C_{in}$) + $\frac{R_{wire}}{\frac{L}{S_k}}$$\cdot$$C_{in}$ + $\frac{1}{2}$($\frac{C_{wire}}{\frac{L}{S_k}}$$\cdot$$\frac{R_{wire}}{\frac{L}{S_k}}$)\\
+\hspace*{\fill} \\
+$\tau_{all}$ = $R_{input}$$\cdot$$C_{wire}$$\cdot$$\frac{s_1+\cdots+s_N}{L}$ + $N$$\cdot$$R_{input}$$\cdot$$C_{in}$ + $R_{wire}$$\cdot$$C_{in}$$\cdot$$\frac{s_1+\cdots+s_N}{L}$ + $\frac{R_{wire}\cdot C_{wire}}{2L^2}$($s_1^2+\cdots+s_N^2$)\\
+\hspace*{\fill} \\
+\hspace*{0.6cm}= $R_{input}$$\cdot$($C_{wire}$ + $N$$\cdot$$C_{in}$) + $R_{wire}$$\cdot$$C_{in}$ + $\frac{R_{wire}\cdot C_{wire}}{2L^2}$($s_1^2+\cdots+s_N^2$)\\
+\hspace*{\fill} \\
+Minimize $T$($s_1,\cdots,s_N$) = $s_1^2+\cdots+s_N^2$\\
+Subject to $s_1+\cdots+s_N$ = $L$\\
+\hspace*{\fill} \\
+$\frac{\partial T}{\partial s_k}$ = 2$\cdot$$s_k$ + 2$\cdot$$s_N$$\cdot$(-1) = 0  $\Longrightarrow$ $s_k$ = $s_N$ , therefore, $s_1$ = $s_2$ = $\cdots$ = $s_n$\\
+\hspace*{\fill} \\
+$\tau_{all}$ = $R_{input}$$\cdot$($C_{wire}$ + $N$$\cdot$$C_{in}$) + $R_{wire}$$\cdot$$C_{in}$ + $\frac{R_{wire}\cdot C_{wire}}{2N}$\\
+\hspace*{\fill} \\
+That means the insert buffers should be the same type.\\
+\hspace*{\fill} \\
+$\frac{\partial T_{all}}{\partial N}$ = $R_{input}$$\cdot$$C_{in}$ - $\frac{R_{wire}\cdot C_{wire}}{2N}$ = 0 $\Longrightarrow$ $N$ = $\sqrt{\frac{R_{wire}\cdot C_{wire}}{2\cdot R_{input}\cdot C_{in}}}$\\
+\hspace*{\fill} \\
+However, since the $R_{input}$, $C_{in}$, $R_{wire}$, $C_{wire}$ are all unknown. So, I can not optimal $N$ by calculation.\\
+\hspace*{\fill} \\
+
+\subsection*{3. Buffers' Parameters}
+Intuition, if I insert each of type buffer into wire then I can get the electronic preproty of each buffers. I can choose the best one of electronic property buffer insert wire and change the number of them, then get the minimize delay of the wire.\\
+
+\newpage
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.9]{figure4.png}
+\caption{Each Buffer's Electronic Preproty}
+\label{fig:label}
+\end{figure}
+As the Figure 1 shown, the best electronic preproty buffers are BUF\_X4 and BUF\_X8.\\
+\hspace*{\fill} \\
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.9]{figure5.png}
+\caption{Each Buffer's Delay (When the total insert buffer's number is 9)}
+\label{fig:label}
+\end{figure}
+Figure 2 states that, when I evenly insert 9 X1 buffers into wire the total delay is 1.289. The rest types of buffer total delay shown in the figure 2. The results demonstrated that the best electronic property buffers are BUF\_X4 and BUF\_X8.\\
+\hspace*{\fill} \\
+
+\newpage
+\subsection*{4. Minimize The Total Delay}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.9]{figure6.png}
+\caption{Minimize The Total Delay of BUF\_X4 and BUF\_X8}
+\label{fig:label}
+\end{figure}
+Based on the conclusion of above, we can get the minimize total delay as figure 3 shows. We can got the minimized total delay 0.662 when the total number of BUF\_X8 buffer are 10.\\
+\hspace*{\fill} \\
+However, after I analysised the result of delay report (Figure 4 and Figure 5), I found two problems:\\
+\hspace*{\fill} \\
+(1) The head of the wire and the first inserted buffer's delay is extremely higher than the rest of \hspace*{0.55cm}buffers'; ($\textbf{Insufficient optimization}$)\\
+\hspace*{\fill} \\
+(2) The tail of the wire delay is extremely lower than the rest of buffers'. ($\textbf{Over optimization}$)\\
+\hspace*{\fill} \\
+So, I am trying to reduce the delay of heads wire simultaneously increase the delay of tails wire. The problem is what is the degree of reducing or increasing the delay?\\
+\hspace*{\fill} \\
+From the result we found that besides the first buffer, the remaining of buffers' sum of out/A and out/Z are equal. Therefore, I will reduce the head of wire delay equal to the average of the sum of out/A and out/Z. Then increase the tail of wire delay equal to the avarage of the sum of out/A and out/Z. That means I should move the entire buffer queues some distance toward to the head of wire.\\
+\hspace*{\fill} \\
+For instance, the number of insert buffer is 11. Each segment length will be 5000/12 = 416.66$\cdots$. From the figure 5 we known that, the sum of out/A and out/Z is 0.051, the delay of input signal is 0.068. So, the first buffer location = (0.051/0.068) $\times$ (5000/12) = 312.5.\\
+\hspace*{\fill} \\
+So, the new first buffer location will be at distance signal input 312.5. The remaining segments still 5000/12.\\
+\hspace*{\fill} \\
+
+\newpage
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.7]{figure7.png}
+\caption{Analyze The Result Of Inserting 10 BUF\_X8}
+\label{fig:label}
+\end{figure}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.7]{figure8.png}
+\caption{Analyze The Result Of Inserting 11 BUF\_X8}
+\label{fig:label}
+\end{figure}
+
+\newpage
+After that, I try to remove a buffer from the end of the buffer queue. Then I got a minimized total delay as the figure 6 and 7 shows.\\
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.7]{figure9.png}
+\caption{The Result Of New Way To Minimize 11 BUF\_X8 Delay}
+\label{fig:label}
+\end{figure}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.7]{figure10.png}
+\caption{The Result Of New Way To Minimize The Total Delay}
+\label{fig:label}
+\end{figure}
+Clearly, when the number of BUF\_X8 buffers is 10 then I can get the minimal total delay 0.634.
+
+\end{flushleft}
+\clearpage
+\end{document}
